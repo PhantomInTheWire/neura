@@ -1,0 +1,31 @@
+# Virtual Environment
+.venv/
+venv/
+*/.venv/
+*/venv/
+
+# Environment files
+.env
+*.env
+
+# Temporary files
+temp_uploads/
+*.tmp
+*.bak
+*.swp
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# IDE / Editor specific files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS specific files
+.DS_Store
+Thumbs.db
