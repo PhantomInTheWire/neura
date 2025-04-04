@@ -6,6 +6,7 @@ type Props = {
   };
 };
 
-export default function page(props: Props) {
-  return <Workspace workspaceId={props.params.workspaceId} />;
+export default async function page(props: Props) {
+  const { workspaceId } = await props.params;
+  return <Workspace workspaceId={workspaceId} />;
 }
