@@ -17,7 +17,7 @@ export default function Navbar() {
   const { setTheme } = useTheme();
 
   return (
-    <nav className="border-b">
+    <nav className="border-b sticky top-0 z-50 backdrop-blur">
       <div className="flex h-16 items-center px-4 container mx-auto">
         {/* Search Bar */}
         <div className="flex items-center w-full max-w-sm">

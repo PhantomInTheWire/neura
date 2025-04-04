@@ -12,22 +12,23 @@ import {
   HelpCircle,
   ChevronLeft,
 } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import Link from "next/link";
+// import {
+//   Tooltip,
+//   TooltipContent,
+//   TooltipProvider,
+//   TooltipTrigger,
+// } from "@/components/ui/tooltip";
 
 const LINKS = [
-  { name: "Uploads", icon: Upload, action: () => null },
-  { name: "Overview", icon: Layout, action: () => null },
-  { name: "Chat", icon: MessagesSquare, action: () => null },
-  { name: "Quiz", icon: Book, action: () => null },
-  { name: "FAQ", icon: HelpCircle, action: () => null },
+  { name: "Uploads", icon: Upload, url: "uploads" },
+  { name: "Overview", icon: Layout, url: "overview" },
+  { name: "Chat", icon: MessagesSquare, url: "chat" },
+  { name: "Quiz", icon: Book, url: "quiz" },
+  { name: "FAQ", icon: HelpCircle, url: "faq" },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ workspaceId }: { workspaceId: string }) {
   const [isOpen, toggleOpen] = useSidebarStore(
     useShallow((state) => [state.isOpen, state.toggleOpen])
   );
@@ -35,7 +36,7 @@ export default function Sidebar() {
   return (
     <div
       className={cn(
-        "flex flex-col h-screen border-r bg-background transition-all duration-300 ease-in-out",
+        "h-screen flex flex-col border-r bg-background transition-all duration-300 ease-in-out sticky top-0",
         isOpen ? "w-64" : "w-16"
       )}
     >
@@ -64,29 +65,44 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex flex-col gap-2 p-4">
-        <TooltipProvider delayDuration={0}>
-          {LINKS.map((link) => (
-            <Tooltip key={link.name}>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className={cn(
-                    "w-full justify-start cursor-pointer",
-                    !isOpen && "justify-center"
-                  )}
-                  onClick={link.action}
-                >
-                  <link.icon className="h-4 w-4" />
-                  {isOpen && <span className="ml-3">{link.name}</span>}
-                </Button>
-              </TooltipTrigger>
-              {!isOpen && (
-                <TooltipContent side="right">{link.name}</TooltipContent>
+        {LINKS.map((link) => (
+          <Link href={`./${link.url}`} key={link.name}>
+            <Button
+              variant="ghost"
+              className={cn(
+                "w-full justify-start cursor-pointer",
+                !isOpen && "justify-center"
               )}
-            </Tooltip>
-          ))}
-        </TooltipProvider>
+            >
+              <link.icon className="h-4 w-4" />
+              {isOpen && <span className="ml-3">{link.name}</span>}
+            </Button>
+          </Link>
+        ))}
       </nav>
     </div>
   );
 }
+
+// {/* <TooltipProvider delayDuration={0}>
+//           {LINKS.map((link) => (
+//             <Tooltip key={link.name}>
+//               {/* <TooltipTrigger asChild> */}
+//                 <Button
+//                   variant="ghost"
+//                   className={cn(
+//                     "w-full justify-start cursor-pointer",
+//                     !isOpen && "justify-center"
+//                   )}
+//                   onClick={link.action}
+//                 >
+//                   <link.icon className="h-4 w-4" />
+//                   {isOpen && <span className="ml-3">{link.name}</span>}
+//                 </Button>
+//               {/* </TooltipTrigger> */}
+//               {!isOpen && (
+//                 <TooltipContent side="right">{link.name}</TooltipContent>
+//               )}
+//             </Tooltip>
+//           ))}
+//         </TooltipProvider> */}
