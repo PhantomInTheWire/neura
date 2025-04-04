@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Clipboard, X } from "lucide-react";
+import { Check, X } from "lucide-react";
 import MarkdownRenderer from "./MarkdownRenderer";
 
 export default function Overview() {
