@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from typing import List
-from python_chatedu_api import models # Use absolute import
+from py_neuro import models # Use absolute import
 
 router = APIRouter()
 
@@ -25,6 +25,7 @@ async def get_topic_nodes(notebook_id: int):
     (Currently returns dummy data)
     """
     # In a real implementation, you would query the database based on notebook_id
+    # Note: notebook_id might need to be ObjectId if linked to Workspaces
     print(f"Fetching nodes for notebook_id: {notebook_id}")
     return dummy_nodes
 
@@ -35,5 +36,6 @@ async def get_topic_edges(notebook_id: int):
     (Currently returns dummy data)
     """
     # In a real implementation, you would query the database based on notebook_id
+    # Note: notebook_id might need to be ObjectId if linked to Workspaces
     print(f"Fetching edges for notebook_id: {notebook_id}")
     return dummy_edges
