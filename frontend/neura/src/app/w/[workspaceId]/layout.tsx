@@ -10,10 +10,14 @@ type Props = {
   };
 };
 
-export default async function layout({ children, params }: Props) {
-  const { workspaceId } = await params;
+// Accept full params object
+export default function Layout({ children, params }: Props) {
+  // Extract workspaceId inside the function body
+  const { workspaceId } = params;
+
   return (
     <div className="w-full flex h-screen overflow-hidden">
+      {/* Pass the extracted workspaceId */}
       <Sidebar workspaceId={workspaceId} />
       <main className="flex-1 flex flex-col overflow-y-auto">
         <Navbar />

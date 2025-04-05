@@ -13,7 +13,8 @@ from .utils import extract_text_and_images_pdf, extract_text_and_images_pptx, ex
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-from ..models import Workspace, WorkspaceCreate, WorkspaceUpdate, StudyGuideResponse, ExtractedImageInfo # Relative import
+# Import the new response model
+from ..models import Workspace, WorkspaceCreate, WorkspaceUpdate, StudyGuideResponse, ExtractedImageInfo, WorkspaceWithPopulatedStudyGuides
 from ..database import get_database, get_gridfs_bucket # Relative import
 
 router = APIRouter()
@@ -56,9 +57,10 @@ async def create_workspace(workspace: WorkspaceCreate, db: AsyncIOMotorDatabase 
     return created_workspace
 
 # GET: api/workspaces/123
-@router.get("/{workspace_id}", response_model=Workspace)
+# Use the new response model that includes populated study guides
+@router.get("/{workspace_id}", response_model=WorkspaceWithPopulatedStudyGuides)
 async def get_workspace(workspace_id: str, db: AsyncIOMotorDatabase = Depends(get_database)):
-    """Get a specific workspace by ID."""
+    """Get a specific workspace by ID, populating study guides."""
     if db is None:
         raise HTTPException(status_code=503, detail="Database connection not available")
     if not ObjectId.is_valid(workspace_id):
@@ -67,7 +69,35 @@ async def get_workspace(workspace_id: str, db: AsyncIOMotorDatabase = Depends(ge
     workspace = await db["workspaces"].find_one({"_id": ObjectId(workspace_id)})
     if workspace is None:
         raise HTTPException(status_code=404, detail="Workspace not found")
-    return workspace
+    # Use aggregation to populate study_guides
+    pipeline = [
+        {"$match": {"_id": ObjectId(workspace_id)}},
+        {
+            "$lookup": {
+                "from": "study_guides", # The name of the study guides collection
+                "localField": "study_guides", # The field in the workspaces collection (contains list of ObjectIds)
+                "foreignField": "_id", # The field in the study_guides collection to match against
+                "as": "populated_study_guides" # The name of the new array field to add
+            }
+        }
+    ]
+    result_cursor = db["workspaces"].aggregate(pipeline)
+    populated_workspace = await result_cursor.to_list(length=1) # Should be only one result
+
+    if not populated_workspace:
+        raise HTTPException(status_code=404, detail="Workspace not found")
+
+    # Replace the list of IDs with the populated documents
+    # Note: The response model might need adjustment if it strictly expects only IDs.
+    # For now, let's assume the frontend can handle the populated structure.
+    # We might need a different response model later if validation fails.
+    final_workspace = populated_workspace[0]
+    final_workspace["study_guides"] = final_workspace.pop("populated_study_guides", []) # Rename field for consistency
+
+    # The response_model=WorkspaceWithPopulatedStudyGuides handles validation.
+    # FastAPI will automatically validate the final_workspace dict against the model.
+    return final_workspace
+
 
 # PUT: api/workspaces/123
 @router.put("/{workspace_id}", response_model=Workspace)
@@ -204,6 +234,15 @@ async def upload_and_create_study_guide(
             image_paths=filtered_image_paths # Pass paths of filtered images
         )
 
+        # Update the workspace to include this study guide ID
+        if saved_study_guide and saved_study_guide.id:
+            # Add the new study guide ID to the workspace's study_guides array
+            await db["workspaces"].update_one(
+                {"_id": ObjectId(workspace_id)},
+                {"$addToSet": {"study_guides": saved_study_guide.id}}
+            )
+            logger.info(f"Updated workspace {workspace_id} with new study guide ID {saved_study_guide.id}")
+        
         # Return the saved data (which includes the _id and GridFS IDs)
         return saved_study_guide
 

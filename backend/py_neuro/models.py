@@ -68,11 +68,42 @@ class Workspace(WorkspaceBase):
     # Use PyObjectId for the id field, aliased to MongoDB's _id
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     created_at: datetime = Field(default_factory=datetime.utcnow)
+    # Add the field to hold study guide IDs
+    study_guides: Optional[List[PyObjectId]] = Field(default_factory=list) # Default to empty list
 
     class Config:
         populate_by_name = True # Pydantic v2 equivalent of allow_population_by_field_name
-        arbitrary_types_allowed = True # Still useful for ObjectId if not perfectly handled by schema
-        # json_encoders is deprecated in V2; serialization is handled by __get_pydantic_core_schema__
+        arbitrary_types_allowed = True
+        json_schema_extra = {
+            "example": {
+                "title": "My Example Workspace",
+                "description": "This is a sample workspace.",
+                "_id": "60d5ec49f7e4e2a4e8f3e8a0",
+                "created_at": "2023-01-01T12:00:00Z",
+                "study_guides": ["60d5ec5af7e4e2a4e8f3e8a1"]
+            }
+        }
+
+# Model for returning workspace with populated study guides
+class WorkspaceWithPopulatedStudyGuides(Workspace):
+    # Override study_guides to expect full StudyGuideResponse objects
+    study_guides: Optional[List['StudyGuideResponse']] = Field(default_factory=list)
+
+    class Config:
+        populate_by_name = True
+        arbitrary_types_allowed = True
+        json_schema_extra = {
+             "example": {
+                 "title": "My Populated Workspace",
+                 "description": "Workspace with full study guides.",
+                 "_id": "60d5ec49f7e4e2a4e8f3e8a0",
+                 "created_at": "2023-01-01T12:00:00Z",
+                 "study_guides": [
+                     # Example of a populated StudyGuideResponse would go here
+                 ]
+             }
+         }
+
 
 # --- Topics Models (Keep if still needed, or remove if study guide handles hierarchy) ---
 class TopicNode(BaseModel):
