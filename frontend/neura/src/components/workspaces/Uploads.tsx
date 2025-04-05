@@ -42,7 +42,8 @@ export default function Uploads() {
   const files = useFileStore(useShallow((state) => state.files));
 
   return (
-    <div className="container mx-auto p-6">
+    // Removed container div with p-6 to avoid double padding from layout
+    <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Upload Section */}
         <div className="space-y-6">
@@ -146,6 +147,6 @@ export default function Uploads() {
           </ScrollArea>
         </div>
       </div>
-    </div>
+    </>
   );
 }

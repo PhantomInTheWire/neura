@@ -1,9 +1,0 @@
-fastapi[standard]>=0.100.0,<0.111.0
-
-# Study Guide Dependencies
-PyMuPDF>=1.23.0,<1.24.0           # For PDF text/image extraction
-python-pptx>=0.6.0,<0.7.0
-python-docx>=1.0.0,<2.0.0
-google-generativeai>=0.3.0,<0.4.0 # Check latest stable version if needed
-python-dotenv>=1.0.0,<2.0.0
-Pillow>=10.0.0,<11.0.0            # For image handling

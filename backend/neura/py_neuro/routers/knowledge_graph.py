@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from typing import List
-from python_chatedu_api import models # Use absolute import
+from py_neuro import models # Use absolute import
 
 router = APIRouter()
 

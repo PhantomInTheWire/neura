@@ -1,9 +1,9 @@
 from fastapi import FastAPI
-from python_chatedu_api.routers import knowledge_graph, topics, study_guide # Use absolute import
+from py_neuro.routers import knowledge_graph, topics, study_guide # Use absolute import
 
 app = FastAPI(
-    title="ChatEDU Python API Clone",
-    description="A partial clone of the ChatEDU API focusing on Knowledge Graph.",
+    title="pyneuro",
+    description="API focusing on Knowledge Graph.",
     version="0.1.0",
 )
 
@@ -14,7 +14,7 @@ app.include_router(study_guide.router, prefix="/api/study-guides", tags=["Study 
 
 @app.get("/")
 async def read_root():
-    return {"message": "Welcome to the ChatEDU Python API Clone!"}
+    return {"message": "Welcome to pynuro!"}
 
 # Placeholder 
 # for future database connection/disconnection logic
