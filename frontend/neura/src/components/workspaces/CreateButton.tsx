@@ -17,7 +17,7 @@ import { Plus } from "lucide-react";
 
 export default function CreateButton() {
   const BASE_URL =
-    process.env.NEXT_PUBLIC_API_ENDPOINT ?? "http://localhost:8000";
+    process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
   const [open, setOpen] = useState(false);
   const [workspaceName, setWorkspaceName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -27,14 +27,15 @@ export default function CreateButton() {
     setIsLoading(true);
 
     try {
+      // Remove trailing slash from URL
       const response = await fetch(`${BASE_URL}/api/workspaces`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name: workspaceName }),
-      });
-
+         headers: {
+           "Content-Type": "application/json",
+         },
+         body: JSON.stringify({ title: workspaceName }), // Use 'title' instead of 'name'
+       });
+ 
       if (!response.ok) {
         throw new Error("Failed to create workspace");
       }

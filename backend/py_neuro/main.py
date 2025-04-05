@@ -39,12 +39,14 @@ app.add_middleware(
 )
 
 # Include routers
-# Order might matter depending on path specificity, putting workspaces first as in source
+# Reverted to original order: more specific prefixes first
 app.include_router(workspaces.router, prefix="/api/workspaces", tags=["Workspaces"])
-app.include_router(knowledge_graph.router, prefix="/api", tags=["Knowledge Graph"])
 app.include_router(topics.router, prefix="/api/topics", tags=["Topics"])
-# app.include_router(study_guide.router, prefix="/api/study-guides", tags=["Study Guides"])
-app.include_router(files.router, prefix="/api/files", tags=["Files"]) # Include files router
+app.include_router(files.router, prefix="/api/files", tags=["Files"])
+# Changed prefix for study_guide router
+app.include_router(study_guide.router, prefix="/api/study-guides", tags=["Study Guides"])
+app.include_router(knowledge_graph.router, prefix="/api", tags=["Knowledge Graph"])
+
 
 @app.get("/")
 async def read_root():

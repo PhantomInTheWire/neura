@@ -7,7 +7,7 @@ interface WorkspaceCardProps {
   id: string;
   title: string;
   dateCreated: string;
-  sources: string[];
+  sources?: string[]; // Make sources optional
 }
 
 const WorkspaceCard: React.FC<WorkspaceCardProps> = ({
@@ -28,13 +28,16 @@ const WorkspaceCard: React.FC<WorkspaceCardProps> = ({
           <Calendar className="h-4 w-4 mr-2" />
           {new Date(dateCreated).toLocaleDateString()}
         </div>
-        <div className="flex flex-wrap gap-2">
-          {sources.map((source, index) => (
-            <Badge key={index} variant="secondary">
-              {source}
-            </Badge>
-          ))}
-        </div>
+        {/* Conditionally render sources */}
+        {sources && sources.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-4"> {/* Added mt-4 for spacing */}
+            {sources.map((source, index) => (
+              <Badge key={index} variant="secondary">
+                {source}
+              </Badge>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );

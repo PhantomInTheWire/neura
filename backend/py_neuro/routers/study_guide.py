@@ -183,7 +183,8 @@ async def read_study_guide(study_guide_id: str, db: AsyncIOMotorDatabase = Depen
     return study_guide
 
 # Endpoint to retrieve all study guides for a specific workspace
-@router.get("/workspaces/{workspace_id}/study-guides/", response_model=List[models.StudyGuideResponse]) # Corrected path
+# Changed path to avoid potential conflict with /api/workspaces
+@router.get("/study-guides/by-workspace/{workspace_id}/", response_model=List[models.StudyGuideResponse])
 async def list_study_guides_for_workspace(workspace_id: str, db: AsyncIOMotorDatabase = Depends(get_database)):
     """
     Retrieves all study guide documents associated with a specific workspace_id.

@@ -45,6 +45,7 @@ async def get_workspaces(db: AsyncIOMotorDatabase = Depends(get_database)):
 @router.post("/", response_model=Workspace, status_code=201)
 async def create_workspace(workspace: WorkspaceCreate, db: AsyncIOMotorDatabase = Depends(get_database)):
     """Create a new workspace."""
+    print(">>> Entering create_workspace function") # Add diagnostic print
     if db is None:
         raise HTTPException(status_code=503, detail="Database connection not available")
     # Use model_dump() for Pydantic v2

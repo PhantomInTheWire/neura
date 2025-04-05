@@ -38,7 +38,7 @@ const loadingStates = [
 ];
 
 export default function Uploads({ workspaceId }: { workspaceId: string }) {
-  const BASE_URL = process.env.API_ENDPOINT ?? "http://localhost:8000";
+  const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
   const [loading, setLoading] = useState(false);
   const { fileInputRef, handleFileChange, removeFile } = useFileUpload();
   const files = useFileStore(useShallow((state) => state.files));
@@ -79,23 +79,31 @@ export default function Uploads({ workspaceId }: { workspaceId: string }) {
     try {
       const formData = new FormData();
 
-      // Attach all files from the store
-      // const files: File[] = [];
-      for (const file of files) {
-        try {
-          // const fileBlob = await dataURLtoBlob(file.url);
-          formData.append("files", file.file);
-        } catch (error) {
-          console.error(`Error processing file ${file.name}:`, error);
-          // You might want to show an error toast here
-          continue;
-        }
+      // Ensure there's exactly one file selected (based on current backend)
+      if (files.length !== 1) {
+        // TODO: Show user feedback (e.g., toast notification)
+        console.error("Please select exactly one file to upload.");
+        setLoading(false); // Stop loading indicator
+        return; // Exit if no file or multiple files selected
       }
 
-      // Only proceed if we have files to upload
-      if (formData.has("files")) {
+      const fileToUpload = files[0]; // Get the single file
+
+      try {
+        formData.append("file", fileToUpload.file); // Use 'file' key and the actual File object
+      } catch (error) {
+        console.error(`Error processing file ${fileToUpload.name}:`, error);
+        // You might want to show an error toast here
+        setLoading(false);
+        // Removed invalid 'continue;'
+        return; // Exit if error processing the file
+      }
+
+
+      // Only proceed if we have the file in formData
+      if (formData.has("file")) {
         const response = await fetch(
-          `${BASE_URL}/api/workspaces/${workspaceId}/study-guides`,
+          `${BASE_URL}/api/workspaces/${workspaceId}/study-guides`, // Use workspaceId from props
           {
             method: "POST",
             body: formData,
@@ -106,11 +114,18 @@ export default function Uploads({ workspaceId }: { workspaceId: string }) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
+<<<<<<< Updated upstream
         const result = await response.json();
         newId = result.id;
         // redirect(`./w/${result.id}`);
+=======
+        // const result = await response.json(); // We might not need the result for redirect
+        // Redirect to the overview page of the current workspace
+        redirect(`/w/${workspaceId}/overview`);
+>>>>>>> Stashed changes
       } else {
-        throw new Error("No valid files to upload");
+        // This case should ideally be caught by the length check above
+        throw new Error("No valid file to upload");
       }
     } catch (error) {
       console.error("Upload failed:", error);
@@ -137,7 +152,7 @@ export default function Uploads({ workspaceId }: { workspaceId: string }) {
 
           <Input
             type="file"
-            multiple // Add multiple attribute
+            // multiple // Remove multiple attribute to enforce single file upload
             className="hidden"
             ref={fileInputRef}
             onChange={handleFileChange}
@@ -152,9 +167,9 @@ export default function Uploads({ workspaceId }: { workspaceId: string }) {
               <FilePlus className="h-6 w-6 text-muted-foreground" />
             </div>
             <div className="text-center">
-              <p className="text-sm font-medium">Click to select files</p>
+              <p className="text-sm font-medium">Click to select a file</p>
               <p className="text-xs text-muted-foreground">
-                You can select multiple files
+                Select one file to generate an overview
               </p>
             </div>
           </div>
