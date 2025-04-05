@@ -43,50 +43,79 @@ export default function Uploads({ workspaceId }: { workspaceId: string }) {
   const { fileInputRef, handleFileChange, removeFile } = useFileUpload();
   const files = useFileStore(useShallow((state) => state.files));
 
+  // const dataURLtoBlob = (dataUrl: string): Blob => {
+  //   try {
+  //     // Handle File objects that might have been passed directly
+  //     if (dataUrl instanceof Blob) {
+  //       return dataUrl;
+  //     }
+
+  //     // Ensure we have a valid data URL
+  //     if (!dataUrl.startsWith("data:")) {
+  //       throw new Error("Invalid data URL");
+  //     }
+
+  //     const [header, base64Data] = dataUrl.split(",");
+  //     const mime = header.match(/:(.*?);/)?.[1] || "application/octet-stream";
+
+  //     // Ensure we have valid base64 data
+  //     if (!base64Data) {
+  //       throw new Error("Invalid base64 data");
+  //     }
+
+  //     // Decode base64 safely
+  //     const decoded = Buffer.from(base64Data, "base64");
+  //     return new Blob([decoded], { type: mime });
+  //   } catch (error) {
+  //     console.error("Error converting data URL to Blob:", error);
+  //     throw error;
+  //   }
+  // };
+
+  // Update the handleGenerateOverview function to handle errors better
   const handleGenerateOverview = async () => {
     setLoading(true);
     try {
       const formData = new FormData();
 
       // Attach all files from the store
-      files.forEach((file) => {
-        // Convert data URL back to File object
-        const fileBlob = dataURLtoBlob(file.url);
-        formData.append(
-          "files",
-          new File([fileBlob], file.name, { type: file.type })
-        );
-      });
-
-      const response = await fetch(`${BASE_URL}/api/study-guides/upload`, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      // const files: File[] = [];
+      for (const file of files) {
+        try {
+          // const fileBlob = await dataURLtoBlob(file.url);
+          formData.append("files", file.file);
+        } catch (error) {
+          console.error(`Error processing file ${file.name}:`, error);
+          // You might want to show an error toast here
+          continue;
+        }
       }
 
-      const result = await response.json();
-      redirect(`./w/${result.id}`);
+      // Only proceed if we have files to upload
+      if (formData.has("files")) {
+        const response = await fetch(
+          `${BASE_URL}/api/workspaces/${workspaceId}/study-guides`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        redirect(`./w/${result.id}`);
+      } else {
+        throw new Error("No valid files to upload");
+      }
     } catch (error) {
       console.error("Upload failed:", error);
       // Add error handling here (e.g., toast notification)
     } finally {
       setLoading(false);
     }
-  };
-
-  const dataURLtoBlob = (dataUrl: string): Blob => {
-    const arr = dataUrl.split(",");
-    const mime = arr[0].match(/:(.*?);/)?.[1];
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new Blob([u8arr], { type: mime });
   };
 
   return (
