@@ -120,7 +120,7 @@ export default function Uploads({ workspaceId }: { workspaceId: string }) {
 
   return (
     // Removed container div with p-6 to avoid double padding from layout
-    <>
+    <div className="p-6 w-full max-w-4xl mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Upload Section */}
         <div className="space-y-6">
@@ -225,6 +225,6 @@ export default function Uploads({ workspaceId }: { workspaceId: string }) {
           </ScrollArea>
         </div>
       </div>
-    </>
+    </div>
   );
 }
