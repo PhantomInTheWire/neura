@@ -1,0 +1,3 @@
+[submodule "backend/TheoremExplainAgentService"]
+	path = backend/TheoremExplainAgentService
+	url = https://github.com/PhantomInTheWire/TheoremExplainAgent
