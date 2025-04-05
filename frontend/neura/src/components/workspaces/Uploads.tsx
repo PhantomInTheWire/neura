@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { redirect } from "next/navigation";
+import { useState, useEffect } from "react";
 import { useShallow } from "zustand/shallow";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,10 +37,22 @@ const loadingStates = [
   },
 ];
 
-export default function Uploads() {
+export default function Uploads({ workspaceId }: { workspaceId: string }) {
+  const BASE_URL = process.env.API_ENDPOINT ?? "http://localhost:8000";
   const [loading, setLoading] = useState(false);
   const { fileInputRef, handleFileChange, removeFile } = useFileUpload();
   const files = useFileStore(useShallow((state) => state.files));
+
+  useEffect(() => {
+    fetch(`${BASE_URL}/api/study-guides/upload`, {
+      method: "POST",
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        console.log(result);
+        redirect(`./w/${result.id}`);
+      });
+  }, []);
 
   return (
     // Removed container div with p-6 to avoid double padding from layout

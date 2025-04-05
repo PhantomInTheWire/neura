@@ -63,21 +63,30 @@ export default function Overview() {
 
           return (
             // Add id for potential sidebar navigation and scroll margin
-            <div key={sectionId} id={`section-${section.id}`} className="space-y-4 relative scroll-mt-20">
+            <div
+              key={sectionId}
+              id={`section-${section.id}`}
+              className="space-y-4 relative scroll-mt-20"
+            >
               <Card>
-                <CardHeader className="sticky top-16 py-4 bg-card text-2xl"> {/* Adjust top value if navbar height changes */}
+                <CardHeader className="sticky top-16 py-4 bg-card text-2xl">
+                  {" "}
+                  {/* Adjust top value if navbar height changes */}
                   <CardTitle>{section.section_title}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   {/* Added Section Overview Card */}
                   <Card className="mb-6 bg-muted/50 border-dashed">
                     <CardHeader>
-                      <CardTitle className="text-lg">Section Overview</CardTitle>
+                      <CardTitle className="text-lg">
+                        Section Overview
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       {/* Placeholder for overview points - needs data source */}
                       <p className="text-sm text-muted-foreground">
-                        (Overview points for '{section.section_title}' will go here)
+                        (Overview points for &apos;{section.section_title}&apos;
+                        will go here)
                       </p>
                       {/* Example structure if data existed:
                       <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
