@@ -6,15 +6,15 @@ import os
 import shutil
 import logging
 import uuid
-import crud
-from utils import extract_text_and_images_pdf, extract_text_and_images_pptx, extract_text_docx, extract_text_txt, generate_hierarchical_study_guide
+from .. import crud # Relative import
+from .utils import extract_text_and_images_pdf, extract_text_and_images_pptx, extract_text_docx, extract_text_txt, generate_hierarchical_study_guide # Corrected relative import
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-from models import Workspace, WorkspaceCreate, WorkspaceUpdate, StudyGuideResponse, ExtractedImageInfo
-from database import get_database, get_gridfs_bucket
+from ..models import Workspace, WorkspaceCreate, WorkspaceUpdate, StudyGuideResponse, ExtractedImageInfo # Relative import
+from ..database import get_database, get_gridfs_bucket # Relative import
 
 router = APIRouter()
 
@@ -218,4 +218,3 @@ async def upload_and_create_study_guide(
         if os.path.exists(request_image_dir):
              shutil.rmtree(request_image_dir, ignore_errors=True)
         logger.info(f"Cleaned up temporary directories for request {request_id}")
-

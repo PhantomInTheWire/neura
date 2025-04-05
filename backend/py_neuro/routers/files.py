@@ -5,8 +5,8 @@ from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorGridFSBucket
 import mimetypes # To guess content type
 
-# Use absolute import
-from py_neuro.database import get_gridfs_bucket
+# Use relative import
+from ..database import get_gridfs_bucket
 
 logger = logging.getLogger(__name__)
 router = APIRouter()

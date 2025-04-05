@@ -22,9 +22,9 @@ from PIL import Image, UnidentifiedImageError
 import google.generativeai as genai
 
 # Local imports
-import models
+from .. import models # Relative import
 # from utils.image_processing import pre_filter_image
-from config import gemini_model
+from .. import config # Import the whole module
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -146,7 +146,7 @@ def extract_text_txt(file_path: str) -> str:
 # Modified extraction functions to return BOTH all extracted and filtered images
 async def generate_hierarchical_study_guide(text_content: str, images_info: List[models.ExtractedImageInfo], request_image_dir: str) -> List[models.StudyGuideSection]:
     """Uses Gemini multimodal capabilities to generate hierarchical sections, explanations, and image associations."""
-    if not gemini_model:
+    if not config.gemini_model: # Access via config module
         raise HTTPException(status_code=500, detail="Gemini model not configured. Check API key.")
 
     prepared_images = []
@@ -242,7 +242,7 @@ You will receive the full text content of the document and a list of image filen
 
     try:
         logger.info(f"Sending hierarchical multimodal request to Gemini with {len(prepared_images)} images...")
-        response = await gemini_model.generate_content_async(
+        response = await config.gemini_model.generate_content_async( # Access via config module
             prompt_parts,
             generation_config=generation_config
         )
@@ -285,4 +285,3 @@ def pre_filter_image(image_path: str) -> bool:
     except Exception as e:
         logger.warning(f"Error during image pre-filtering for {image_path}: {e}")
         return False # Filter out if error occurs
-

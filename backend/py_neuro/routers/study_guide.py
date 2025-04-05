@@ -16,11 +16,11 @@ from pptx.enum.shapes import MSO_SHAPE_TYPE
 from docx import Document
 from bson import ObjectId # Import ObjectId
 
-# Use absolute import
-import models
-from config import settings # Import settings
-from database import get_database, get_gridfs_bucket # Import DB and GridFS dependencies
-import crud # Import crud functions
+# Use relative imports
+from .. import models
+from ..config import settings # Import settings
+from ..database import get_database, get_gridfs_bucket # Import DB and GridFS dependencies
+from .. import crud # Import crud functions
 from motor.motor_asyncio import AsyncIOMotorDatabase, AsyncIOMotorGridFSBucket # Import DB and GridFS types
 
 # Configure logging
@@ -37,19 +37,7 @@ IMAGE_OUTPUT_DIR_BASE = os.path.join(TEMP_UPLOAD_DIR, "images")
 MIN_IMAGE_WIDTH = 50  # Pixels - adjust as needed for pre-filtering
 MIN_IMAGE_HEIGHT = 50 # Pixels - adjust as needed for pre-filtering
 
-# Configure Gemini
-if not settings.GEMINI_API_KEY or settings.GEMINI_API_KEY == "YOUR_GEMINI_API_KEY_HERE": # Check settings
-    logger.warning("GEMINI_API_KEY not found in settings or is default. Study guide generation will fail.")
-    gemini_model = None
-else:
-    try:
-        genai.configure(api_key=settings.GEMINI_API_KEY) # Use settings
-        # Using gemini-1.5-pro which supports multimodal and JSON output mode
-        gemini_model = genai.GenerativeModel('gemini-2.0-flash')
-        logger.info("Gemini configured successfully with gemini-2.0-flas.")
-    except Exception as e:
-        logger.error(f"Failed to configure Gemini: {e}")
-        gemini_model = None
+# Gemini model is now initialized in config.py
 
 # Ensure temp directories exist
 os.makedirs(TEMP_UPLOAD_DIR, exist_ok=True)

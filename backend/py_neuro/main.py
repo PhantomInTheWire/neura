@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import knowledge_graph, topics, study_guide, workspaces, files
-from database import connect_to_mongo, close_mongo_connection
+from .routers import knowledge_graph, topics, study_guide, workspaces, files
+from .database import connect_to_mongo, close_mongo_connection
 from contextlib import asynccontextmanager
 
 
