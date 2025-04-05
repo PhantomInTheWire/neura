@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Check, X } from "lucide-react";
 import MarkdownRenderer from "./MarkdownRenderer";
 import SectionsSidebar from "../sections-sidebar";
+import { VideoPlayer } from "../ui/VideoPlayer";
 
 export default function Overview() {
   const [selectedAnswers, setSelectedAnswers] = useState<
@@ -72,9 +73,13 @@ export default function Overview() {
               >
                 <Card>
                   <CardHeader className="sticky top-16 py-4 bg-card text-2xl">
-                    {" "}
-                    {/* Adjust top value if navbar height changes */}
-                    <CardTitle>{section.section_title}</CardTitle>
+                    <div className="flex items-center justify-between">
+                      <CardTitle>{section.section_title}</CardTitle>
+                      <VideoPlayer
+                        title={section.section_title}
+                        videoId={section.id} // Assuming section.id can be used as videoId
+                      />
+                    </div>
                   </CardHeader>
                   <CardContent>
                     {/* Added Section Overview Card */}
