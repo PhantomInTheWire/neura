@@ -32,8 +32,8 @@ else:
         # Using a model that supports multimodal and JSON output mode
         # Note: Check Google AI documentation for the latest recommended model for JSON mode.
         # gemini-1.5-flash or gemini-1.5-pro might be suitable. Using flash for potential cost/speed benefits.
-        gemini_model = genai.GenerativeModel('gemini-1.5-flash') # Or 'gemini-1.5-pro'
-        logger.info("Gemini configured successfully with gemini-1.5-flash.")
+        gemini_model = genai.GenerativeModel('gemini-2.0-flash') # Or 'gemini-1.5-pro'
+        logger.info("Gemini configured successfully with gemini-2.0-flash.")
     except Exception as e:
         logger.error(f"Failed to configure Gemini: {e}")
         gemini_model = None # Ensure it's None if configuration fails

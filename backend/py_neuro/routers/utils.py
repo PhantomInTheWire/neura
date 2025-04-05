@@ -2,6 +2,7 @@
 import os
 import json
 import logging
+import uuid # Added for generating section IDs
 from typing import List
 
 # FastAPI imports
@@ -23,6 +24,7 @@ import google.generativeai as genai
 
 # Local imports
 from .. import models # Relative import
+from pydantic import ValidationError # Import for specific error checking
 # from utils.image_processing import pre_filter_image
 from .. import config # Import the whole module
 
@@ -251,23 +253,63 @@ You will receive the full text content of the document and a list of image filen
         logger.info(f"Received raw response from Gemini: {response.text}")
         logger.info(f"Cleaned response text for JSON parsing: {cleaned_response_text}")
 
+        # --- MODIFICATION START ---
+        # 1. Find the last closing bracket and truncate the string
+        last_bracket_index = cleaned_response_text.rfind(']')
+        if last_bracket_index != -1:
+            json_to_parse = cleaned_response_text[:last_bracket_index + 1]
+            logger.info(f"Truncated response for parsing: {json_to_parse}")
+        else:
+            # If no closing bracket is found, attempt to parse the original cleaned text
+            # but log a warning as it's likely malformed.
+            logger.warning("Could not find closing bracket ']' in cleaned AI response. Attempting to parse anyway.")
+            json_to_parse = cleaned_response_text
+
+        # 2. Parse the potentially truncated JSON string into a Python list of dicts
+        raw_sections_list = json.loads(json_to_parse)
+
+        # 3. Add section_id to each section dictionary
+        for section_dict in raw_sections_list:
+            # Ensure it's actually a dictionary before adding the key
+            if isinstance(section_dict, dict):
+                 section_dict["section_id"] = str(uuid.uuid4())
+            else:
+                 # Handle cases where the AI might return non-dict items in the list
+                 logger.warning(f"Skipping non-dictionary item found in AI response list: {section_dict}")
+
+
+        # 3. Prepare the data for Pydantic validation (wrap in the expected structure)
+        data_for_validation = {"study_guide": raw_sections_list}
+        # --- MODIFICATION END ---
+
         # Use Pydantic to parse and validate the list of sections
         # Need a temporary wrapper for the top-level list
         class TempWrapper(models.BaseModel):
              # Use the correct hierarchical model name: StudyGuideSection
              study_guide: List[models.StudyGuideSection]
 
-        parsed_wrapper = TempWrapper.model_validate_json(f'{{"study_guide": {cleaned_response_text}}}')
+        # Validate the modified data
+        parsed_wrapper = TempWrapper.model_validate(data_for_validation) # Use model_validate for dict
         parsed_sections = parsed_wrapper.study_guide
 
         logger.info(f"Successfully parsed Gemini response into {len(parsed_sections)} main sections.")
         return parsed_sections
 
-    except Exception as e:
-        logger.error(f"Error generating hierarchical study guide or parsing response: {e}")
+    except json.JSONDecodeError as json_err: # Add specific catch for JSON parsing
+        logger.error(f"Failed to parse Gemini response as JSON: {json_err}")
         logger.error(f"Cleaned text that failed JSON parsing: {cleaned_response_text if 'cleaned_response_text' in locals() else 'N/A'}")
+        raise HTTPException(status_code=500, detail=f"AI response was not valid JSON: {json_err}")
+    except ValidationError as val_err: # Catch Pydantic validation errors specifically
+        logger.error(f"Pydantic validation failed after adding section_id: {val_err}")
+        logger.error(f"Data failing validation: {data_for_validation if 'data_for_validation' in locals() else 'N/A'}")
         logger.error(f"Gemini raw response was: {response.text if 'response' in locals() else 'N/A'}")
-        raise HTTPException(status_code=500, detail=f"Failed to generate hierarchical study guide using AI or parse its response: {e}")
+        raise HTTPException(status_code=500, detail=f"AI response structure mismatch after processing: {val_err}")
+    except Exception as e: # General catch-all
+        logger.error(f"Unexpected error generating/processing study guide: {e}")
+        # Log relevant context if available
+        logger.error(f"Cleaned text that failed: {cleaned_response_text if 'cleaned_response_text' in locals() else 'N/A'}")
+        logger.error(f"Gemini raw response was: {response.text if 'response' in locals() else 'N/A'}")
+        raise HTTPException(status_code=500, detail=f"Unexpected error processing AI response: {e}")
 
 def pre_filter_image(image_path: str) -> bool:
     """Basic pre-filtering for images based on dimensions."""

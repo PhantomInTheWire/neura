@@ -5,12 +5,6 @@ from .database import connect_to_mongo, close_mongo_connection
 from contextlib import asynccontextmanager
 
 
-app = FastAPI(
-    title="Neura", # Updated title from source
-    description="Learn through Scientifically proven methods!", # Updated description
-    version="0.1.0",
-)
-
 # Lifespan context manager (replaces @app.on_event)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -21,6 +15,15 @@ async def lifespan(app: FastAPI):
     finally:
         # Shutdown
         await close_mongo_connection()
+
+
+# Create the FastAPI app instance AFTER defining lifespan
+app = FastAPI(
+    title="Neura", # Updated title from source
+    description="Learn through Scientifically proven methods!", # Updated description
+    version="0.1.0",
+    lifespan=lifespan # Register the lifespan context manager
+)
 
 # Configure CORS
 origins = [
