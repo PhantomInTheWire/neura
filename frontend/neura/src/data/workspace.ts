@@ -308,3 +308,46 @@ export const QUIZ_DATA: QuizQuestion[] = [
     sectionId: "6",
   },
 ];
+
+export interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+export const FAQ_DATA: FAQItem[] = [
+  {
+    question: "What is PinSage and why is it important?",
+    answer:
+      "PinSage is a highly scalable Graph Convolutional Network (GCN) framework developed by Pinterest for web-scale recommender systems. It's important because it solves the critical challenge of scaling GCNs to billions of nodes and edges, making it practical for large-scale applications like Pinterest's recommendation system.",
+  },
+  {
+    question: "How does PinSage differ from traditional GCNs?",
+    answer:
+      "PinSage differs from traditional GCNs in several key ways: 1) It uses localized convolutions instead of operating on the full graph Laplacian, 2) It employs random walks to define node neighborhoods, 3) It implements importance pooling based on node influence, and 4) It uses a producer-consumer architecture for efficient training on large datasets.",
+  },
+  {
+    question: "What is importance pooling in PinSage?",
+    answer:
+      "Importance pooling is a key innovation in PinSage where nodes are weighted based on their influence determined by random walk visit counts. Instead of treating all neighbors equally, PinSage gives more weight to nodes that are frequently visited during random walks, leading to more effective information aggregation.",
+  },
+  {
+    question: "How does hard negative sampling work?",
+    answer:
+      "Hard negative sampling is a training technique where 'hard' negative examples (items somewhat related to the query but not as related as positive examples) are used during training. These are selected by ranking items using Personalized PageRank scores and sampling from ranks 2000-5000, making the model learn finer distinctions between items.",
+  },
+  {
+    question: "What performance improvements does PinSage achieve?",
+    answer:
+      "PinSage achieved significant improvements in recommendation quality at Pinterest: 1) Over 40% improvement in offline metrics, 2) 60% preference rate in user studies for PinSage recommendations, and 3) 30-100% increase in user engagement in A/B tests.",
+  },
+  {
+    question: "What is curriculum training in PinSage?",
+    answer:
+      "Curriculum training is a learning strategy where the model starts with easier examples and gradually progresses to harder ones. In PinSage, this means beginning training without hard negative examples and gradually introducing them, helping the model learn more effectively.",
+  },
+  {
+    question: "How does PinSage handle the scalability challenge?",
+    answer:
+      "PinSage handles scalability through several techniques: 1) Using localized convolutions instead of full graph operations, 2) Implementing a producer-consumer architecture for efficient GPU utilization, 3) Using MapReduce for distributed inference, and 4) Employing importance-based neighborhood sampling to control memory usage.",
+  },
+];
