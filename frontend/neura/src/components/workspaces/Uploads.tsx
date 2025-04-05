@@ -1,7 +1,7 @@
 "use client";
 
 import { redirect } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useShallow } from "zustand/shallow";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,16 +43,51 @@ export default function Uploads({ workspaceId }: { workspaceId: string }) {
   const { fileInputRef, handleFileChange, removeFile } = useFileUpload();
   const files = useFileStore(useShallow((state) => state.files));
 
-  useEffect(() => {
-    fetch(`${BASE_URL}/api/study-guides/upload`, {
-      method: "POST",
-    })
-      .then((res) => res.json())
-      .then((result) => {
-        console.log(result);
-        redirect(`./w/${result.id}`);
+  const handleGenerateOverview = async () => {
+    setLoading(true);
+    try {
+      const formData = new FormData();
+
+      // Attach all files from the store
+      files.forEach((file) => {
+        // Convert data URL back to File object
+        const fileBlob = dataURLtoBlob(file.url);
+        formData.append(
+          "files",
+          new File([fileBlob], file.name, { type: file.type })
+        );
       });
-  }, []);
+
+      const response = await fetch(`${BASE_URL}/api/study-guides/upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      redirect(`./w/${result.id}`);
+    } catch (error) {
+      console.error("Upload failed:", error);
+      // Add error handling here (e.g., toast notification)
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const dataURLtoBlob = (dataUrl: string): Blob => {
+    const arr = dataUrl.split(",");
+    const mime = arr[0].match(/:(.*?);/)?.[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], { type: mime });
+  };
 
   return (
     // Removed container div with p-6 to avoid double padding from layout
@@ -101,9 +136,10 @@ export default function Uploads({ workspaceId }: { workspaceId: string }) {
             <div className="w-full flex justify-center">
               <Button
                 className="mx-auto cursor-pointer"
-                onClick={() => setLoading(true)}
+                onClick={handleGenerateOverview}
+                disabled={loading}
               >
-                Generate Overview
+                {loading ? "Generating..." : "Generate Overview"}
               </Button>
             </div>
           ) : (
