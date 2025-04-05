@@ -75,6 +75,7 @@ export default function Uploads({ workspaceId }: { workspaceId: string }) {
   // Update the handleGenerateOverview function to handle errors better
   const handleGenerateOverview = async () => {
     setLoading(true);
+    let newId = "1";
     try {
       const formData = new FormData();
 
@@ -106,7 +107,8 @@ export default function Uploads({ workspaceId }: { workspaceId: string }) {
         }
 
         const result = await response.json();
-        redirect(`./w/${result.id}`);
+        newId = result.id;
+        // redirect(`./w/${result.id}`);
       } else {
         throw new Error("No valid files to upload");
       }
@@ -114,7 +116,9 @@ export default function Uploads({ workspaceId }: { workspaceId: string }) {
       console.error("Upload failed:", error);
       // Add error handling here (e.g., toast notification)
     } finally {
-      setLoading(false);
+      if (newId !== "1") setLoading(false);
+      console.log({ newId });
+      redirect(`/w/${newId}/overview`);
     }
   };
 
