@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import Markdown from "react-markdown";
+import { useState, FC } from "react"; // Import FC for functional component typing
+import { useTheme } from "next-themes"; // Import useTheme
+import Markdown, { Components } from "react-markdown"; // Import Components type
+// Removed incorrect CodeProps import
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
@@ -17,16 +19,22 @@ import {
 import "./styles.css";
 
 export default function MarkdownRenderer({ content }: { content: string }) {
+  const { theme } = useTheme(); // Get current theme
+
   return (
-    <Markdown
-      // className="text-muted-foreground"
-      remarkPlugins={[remarkGfm, remarkMath]}
-      rehypePlugins={[rehypeKatex]}
-      components={{
-        code({ node, inline, className, children, ...props }) {
-          const match = /language-(\w+)/.exec(className || ""); // Extracts the language name
-          const language = match ? match[1] : "txt"; // Default to txt if no language
-          const codeText = String(children).trim();
+    // Apply prose classes to a wrapping div
+    <div className="prose dark:prose-invert max-w-none">
+      <Markdown
+        // Removed className from Markdown component
+        remarkPlugins={[remarkGfm, remarkMath]}
+        rehypePlugins={[rehypeKatex]}
+        // Define components object with correct typing
+        components={{
+          // Use 'any' for code props temporarily
+          code({ node, inline, className, children, ...props }: any) {
+            const match = /language-(\w+)/.exec(className || ""); // Extracts the language name
+            const language = match ? match[1] : "txt"; // Default to txt if no language
+            const codeText = String(children).trim();
 
           return !inline && match ? (
             <div className="relative group">
@@ -36,7 +44,8 @@ export default function MarkdownRenderer({ content }: { content: string }) {
               </span>
 
               <SyntaxHighlighter
-                style={theme === "light" ? oneLight : oneDark}
+                // Use theme from hook
+                style={theme === "dark" ? oneDark : oneLight}
                 language={language}
                 {...props}
               >
@@ -49,20 +58,12 @@ export default function MarkdownRenderer({ content }: { content: string }) {
             </code>
           );
         },
-        math({ value }) {
-          return (
-            <span className="my-4 flex justify-center">
-              <span className="block">{value}</span>
-            </span>
-          );
-        },
-        inlineMath({ value }) {
-          return <span className="px-1">{value}</span>;
-        },
-      }}
-    >
-      {content}
-    </Markdown>
+        // Remove math and inlineMath overrides - let rehype-katex handle them
+      } as Components } // Assert type as Components
+      >
+        {content}
+      </Markdown>
+    </div>
   );
 }
 
@@ -83,7 +84,8 @@ const CopyButton = ({ code }: { code: string }) => {
   return (
     <button
       onClick={handleCopy}
-      className="absolute top-2 right-2 bg-gray-800 text-white p-1 rounded-md opacity-80 hover:opacity-100"
+      // Use theme-aware classes for copy button
+      className="absolute top-2 right-2 bg-muted/50 text-muted-foreground hover:bg-muted p-1 rounded-md opacity-70 group-hover:opacity-100 transition-opacity"
     >
       {copied ? (
         <Check size={16} className="text-green-400" />

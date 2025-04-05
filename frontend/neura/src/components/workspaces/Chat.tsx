@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/chat-bubble";
 import { ChatMessageList } from "@/components/ui/chat-message-list";
 import { ChatInput } from "@/components/ui/chat-input";
+import { Card, CardContent } from "@/components/ui/card"; // Import Card
 // import { div } from "@/components/ui/div";
 
 export default function Chat() {
@@ -71,10 +72,12 @@ export default function Chat() {
   };
 
   return (
-    <div className="container mx-auto px-6 max-w-4xl grow">
-      <div className="flex flex-col h-full">
+    // Removed container div with px-6
+    // Wrapped main content in Card and CardContent
+    <Card className="flex flex-col h-full grow">
+      <CardContent className="flex flex-col h-full p-4"> {/* Adjust padding as needed */}
         {/* Messages Section */}
-        <div className="flex-1 overflow-hidden px-4">
+        <div className="flex-1 overflow-hidden"> {/* Removed px-4 */}
           <ChatMessageList className="h-full">
             {messages.map((message) => (
               <ChatBubble
@@ -113,10 +116,11 @@ export default function Chat() {
         </div>
 
         {/* Input Section */}
-        <div className="border p-4 rounded-xl">
+        {/* Removed border, padding, rounded-xl from wrapper div */}
+        <div className="mt-4">
           <form
             onSubmit={handleSubmit}
-            className="relative rounded-lg border shadow-sm focus-within:ring-0 focus-within:ring-ring"
+            className="relative rounded-lg border shadow-sm focus-within:ring-0 focus-within:ring-ring bg-background" // Added bg-background for contrast
           >
             <ChatInput
               value={input}
@@ -157,7 +161,7 @@ export default function Chat() {
             </div>
           </form>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

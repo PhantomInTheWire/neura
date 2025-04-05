@@ -3,6 +3,7 @@
 import { useShallow } from "zustand/shallow";
 import { useSidebarStore } from "@/store/sidebar";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card"; // Import Card components
 import { cn } from "@/lib/utils";
 import {
   Upload,
@@ -50,11 +51,13 @@ export default function Sidebar({ workspaceId }: { workspaceId: string }) {
         </h1>
       </Link>
 
-      {/* Navigation Links */}
-      <nav className="flex-1 flex flex-col gap-2 p-4">
-        {LINKS.map((link) => {
-          const isActive = pathname.includes(link.url);
-          return (
+      {/* Navigation Links Card */}
+      <div className="flex-1 p-4"> {/* Added padding around the card */}
+        <Card className="p-0"> {/* Remove default card padding */}
+          <CardContent className="p-2 flex flex-col gap-2"> {/* Add padding inside content, keep gap */}
+            {LINKS.map((link) => {
+              const isActive = pathname.includes(link.url);
+              return (
             <Link href={`./${link.url}`} key={link.name}>
               <Button
                 variant={isActive ? "secondary" : "ghost"}
@@ -74,12 +77,14 @@ export default function Sidebar({ workspaceId }: { workspaceId: string }) {
                 )}
               </Button>
             </Link>
-          );
-        })}
-      </nav>
+              );
+            })}
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Toggle Button at Bottom */}
-      <div className="p-4 border-t mt-auto mb-8">
+      <div className="p-4 border-t mt-auto mb-8"> {/* Keep toggle button separate for now */}
         <Button
           variant="ghost"
           size="sm"

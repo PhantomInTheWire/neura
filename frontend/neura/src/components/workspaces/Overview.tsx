@@ -48,7 +48,8 @@ export default function Overview() {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
+    // Removed container div with p-6 to avoid double padding from layout
+    <>
       <h1 className="text-4xl font-bold mb-8">Web-Scale Graph</h1>
 
       <div className="space-y-8">
@@ -61,12 +62,32 @@ export default function Overview() {
             sectionQuiz[currentQuizIndex[sectionId] || 0];
 
           return (
-            <div key={sectionId} className="space-y-4 relative">
+            // Add id for potential sidebar navigation and scroll margin
+            <div key={sectionId} id={`section-${section.id}`} className="space-y-4 relative scroll-mt-20">
               <Card>
-                <CardHeader className="sticky top-16 py-4 bg-card text-2xl">
+                <CardHeader className="sticky top-16 py-4 bg-card text-2xl"> {/* Adjust top value if navbar height changes */}
                   <CardTitle>{section.section_title}</CardTitle>
                 </CardHeader>
                 <CardContent>
+                  {/* Added Section Overview Card */}
+                  <Card className="mb-6 bg-muted/50 border-dashed">
+                    <CardHeader>
+                      <CardTitle className="text-lg">Section Overview</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {/* Placeholder for overview points - needs data source */}
+                      <p className="text-sm text-muted-foreground">
+                        (Overview points for '{section.section_title}' will go here)
+                      </p>
+                      {/* Example structure if data existed:
+                      <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+                        {section.overviewPoints?.map((point, i) => <li key={i}>{point}</li>)}
+                      </ul>
+                      */}
+                    </CardContent>
+                  </Card>
+
+                  {/* Main Explanation */}
                   <MarkdownRenderer content={section.explanation} />
 
                   {/* Display associated images if any */}
@@ -225,6 +246,6 @@ export default function Overview() {
           );
         })}
       </div>
-    </div>
+    </>
   );
 }
