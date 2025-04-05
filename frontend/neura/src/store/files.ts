@@ -6,8 +6,15 @@ export interface FileItem {
   url: string;
   type: string;
   size: number;
+  file: File;
 }
 
+// interface FileStore {
+//   files: FileItem[];
+//   addFiles: (newFiles: FileItem[]) => void;
+//   removeFile: (id: string) => void;
+//   clearFiles: () => void;
+// }
 interface FileStore {
   files: FileItem[];
   addFiles: (newFiles: FileItem[]) => void;

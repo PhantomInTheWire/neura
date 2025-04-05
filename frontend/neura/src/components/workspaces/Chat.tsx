@@ -74,94 +74,94 @@ export default function Chat() {
   return (
     // Removed container div with px-6
     // Wrapped main content in Card and CardContent
-    <Card className="flex flex-col h-full grow">
-      <CardContent className="flex flex-col h-full p-4"> {/* Adjust padding as needed */}
-        {/* Messages Section */}
-        <div className="flex-1 overflow-hidden"> {/* Removed px-4 */}
-          <ChatMessageList className="h-full">
-            {messages.map((message) => (
-              <ChatBubble
-                key={message.id}
-                variant={message.sender === "user" ? "sent" : "received"}
-                className="mb-4"
-              >
-                <ChatBubbleAvatar
-                  className="h-8 w-8 shrink-0"
-                  src={
-                    message.sender === "user"
-                      ? "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=64&h=64&q=80&crop=faces&fit=crop"
-                      : "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=64&h=64&q=80&crop=faces&fit=crop"
-                  }
-                  fallback={message.sender === "user" ? "US" : "AI"}
-                />
-                <ChatBubbleMessage
+    <div className="p-6 w-full max-w-4xl h-full mx-auto">
+      <Card className="flex flex-col h-full grow pb-0">
+        <CardContent className="flex flex-col h-full px-4 pt-4">
+          <div className="flex-1 overflow-hidden">
+            <ChatMessageList className="h-full">
+              {messages.map((message) => (
+                <ChatBubble
+                  key={message.id}
                   variant={message.sender === "user" ? "sent" : "received"}
+                  className="mb-4"
                 >
-                  {message.content}
-                </ChatBubbleMessage>
-              </ChatBubble>
-            ))}
+                  <ChatBubbleAvatar
+                    className="h-8 w-8 shrink-0"
+                    src={
+                      message.sender === "user"
+                        ? "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=64&h=64&q=80&crop=faces&fit=crop"
+                        : "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=64&h=64&q=80&crop=faces&fit=crop"
+                    }
+                    fallback={message.sender === "user" ? "US" : "AI"}
+                  />
+                  <ChatBubbleMessage
+                    variant={message.sender === "user" ? "sent" : "received"}
+                  >
+                    {message.content}
+                  </ChatBubbleMessage>
+                </ChatBubble>
+              ))}
 
-            {isLoading && (
-              <ChatBubble variant="received" className="mb-4">
-                <ChatBubbleAvatar
-                  className="h-8 w-8 shrink-0"
-                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=64&h=64&q=80&crop=faces&fit=crop"
-                  fallback="AI"
-                />
-                <ChatBubbleMessage isLoading />
-              </ChatBubble>
-            )}
-          </ChatMessageList>
-        </div>
+              {isLoading && (
+                <ChatBubble variant="received" className="mb-4">
+                  <ChatBubbleAvatar
+                    className="h-8 w-8 shrink-0"
+                    src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=64&h=64&q=80&crop=faces&fit=crop"
+                    fallback="AI"
+                  />
+                  <ChatBubbleMessage isLoading />
+                </ChatBubble>
+              )}
+            </ChatMessageList>
+          </div>
+          {/* Input Section */}
+          {/* Removed border, padding, rounded-xl from wrapper div */}
+          <div className="mt-4">
+            <form
+              onSubmit={handleSubmit}
+              className="relative rounded-lg border shadow-sm focus-within:ring-0 focus-within:ring-ring bg-background" // Added bg-background for contrast
+            >
+              <ChatInput
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Type your message..."
+                className="min-h-12 resize-none rounded-lg border-0 p-3 shadow-none focus-visible:ring-0 bg-transparent"
+              />
+              <div className="flex items-center p-2 justify-between border-t">
+                <div className="flex gap-0.5">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    type="button"
+                    onClick={handleAttachFile}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <Paperclip className="h-4 w-4" />
+                  </Button>
 
-        {/* Input Section */}
-        {/* Removed border, padding, rounded-xl from wrapper div */}
-        <div className="mt-4">
-          <form
-            onSubmit={handleSubmit}
-            className="relative rounded-lg border shadow-sm focus-within:ring-0 focus-within:ring-ring bg-background" // Added bg-background for contrast
-          >
-            <ChatInput
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Type your message..."
-              className="min-h-12 resize-none rounded-lg border-0 p-3 shadow-none focus-visible:ring-0 bg-transparent"
-            />
-            <div className="flex items-center p-2 justify-between border-t">
-              <div className="flex gap-0.5">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    type="button"
+                    onClick={handleMicrophoneClick}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <Mic className="h-4 w-4" />
+                  </Button>
+                </div>
                 <Button
-                  variant="ghost"
-                  size="icon"
-                  type="button"
-                  onClick={handleAttachFile}
-                  className="text-muted-foreground hover:text-foreground"
+                  type="submit"
+                  size="sm"
+                  className="gap-1.5 cursor-pointer"
                 >
-                  <Paperclip className="h-4 w-4" />
-                </Button>
-
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  type="button"
-                  onClick={handleMicrophoneClick}
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  <Mic className="h-4 w-4" />
+                  Send
+                  <CornerDownLeft className="h-3.5 w-3.5" />
                 </Button>
               </div>
-              <Button
-                type="submit"
-                size="sm"
-                className="gap-1.5 cursor-pointer"
-              >
-                Send
-                <CornerDownLeft className="h-3.5 w-3.5" />
-              </Button>
-            </div>
-          </form>
-        </div>
-      </CardContent>
-    </Card>
+            </form>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

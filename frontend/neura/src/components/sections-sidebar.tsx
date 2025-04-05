@@ -1,21 +1,51 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AI_RESPONSE } from "@/data/workspace"; // Assuming section data comes from here
+import { AI_RESPONSE } from "@/data/workspace";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-
-// TODO: Implement active section highlighting based on scroll position or route
+import { useEffect, useState } from "react";
 
 export default function SectionsSidebar() {
-  // Extract sections for the sidebar (adjust data source if needed)
+  const [activeSection, setActiveSection] = useState<string>("");
+
   const sections = AI_RESPONSE.study_guide.map((section) => ({
-    id: section.id, // Assuming sections have unique IDs
+    id: section.id,
     title: section.section_title,
   }));
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id.replace("section-", ""));
+          }
+        });
+      },
+      {
+        rootMargin: "-20% 0px -80% 0px", // Adjust these values to control when sections become active
+        threshold: 0,
+      }
+    );
+
+    sections.forEach((section) => {
+      const element = document.getElementById(`section-${section.id}`);
+      if (element) observer.observe(element);
+    });
+
+    return () => observer.disconnect();
+  }, [sections]);
+
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(`section-${sectionId}`);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
-    <aside className="hidden lg:flex flex-col w-64 border-l p-4 sticky top-0 h-screen overflow-y-auto">
+    <aside className="hidden lg:flex flex-col w-64 p-4 sticky top-0 h-screen overflow-y-auto">
       <Card className="flex-1">
         <CardHeader>
           <CardTitle className="text-base">Sections</CardTitle>
@@ -23,16 +53,19 @@ export default function SectionsSidebar() {
         <CardContent className="p-2">
           <nav className="flex flex-col gap-1">
             {sections.map((section) => (
-              <Link
+              <button
                 key={section.id}
-                href={`#section-${section.id}`} // Basic hash link for now
+                onClick={() => scrollToSection(section.id)}
                 className={cn(
-                  "px-3 py-1.5 text-sm rounded-md hover:bg-muted text-muted-foreground"
-                  // Add active state styling here later: 'bg-muted font-medium text-foreground'
+                  "px-3 py-1.5 text-sm rounded-md text-left transition-colors",
+                  "hover:bg-muted hover:text-foreground",
+                  activeSection === section.id
+                    ? "bg-muted font-medium text-foreground"
+                    : "text-muted-foreground"
                 )}
               >
                 {section.title}
-              </Link>
+              </button>
             ))}
           </nav>
         </CardContent>
