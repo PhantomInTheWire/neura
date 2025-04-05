@@ -246,4 +246,65 @@ export const QUIZ_DATA: QuizQuestion[] = [
     correctAnswer: 1,
     sectionId: "3",
   },
+  {
+    id: "6",
+    question: "What is importance pooling in PinSage?",
+    options: [
+      "Random selection of nodes",
+      "Weighting nodes based on visit counts from random walks",
+      "Selecting nodes with highest degree",
+      "Pooling based on node features only",
+    ],
+    correctAnswer: 1,
+    sectionId: "5",
+  },
+  {
+    id: "7",
+    question: "What is the purpose of curriculum training in PinSage?",
+    options: [
+      "To train the model faster",
+      "To reduce memory usage",
+      "To gradually increase training difficulty",
+      "To improve GPU utilization",
+    ],
+    correctAnswer: 2,
+    sectionId: "6",
+  },
+  {
+    id: "8",
+    question: "How does PinSage define a node's neighborhood?",
+    options: [
+      "Using fixed k-hop distances",
+      "Using the T most influential nodes",
+      "Using all connected nodes",
+      "Using random node selection",
+    ],
+    correctAnswer: 1,
+    sectionId: "5",
+  },
+  {
+    id: "9",
+    question:
+      "What is the main benefit of sharing parameters across nodes in PinSage?",
+    options: [
+      "Faster training speed",
+      "Better accuracy",
+      "Parameter complexity independent of graph size",
+      "Reduced memory usage",
+    ],
+    correctAnswer: 2,
+    sectionId: "3",
+  },
+  {
+    id: "10",
+    question: "What type of loss function does PinSage use for training?",
+    options: [
+      "Cross-entropy loss",
+      "Mean squared error",
+      "Max-margin ranking loss",
+      "Binary classification loss",
+    ],
+    correctAnswer: 2,
+    sectionId: "6",
+  },
 ];
