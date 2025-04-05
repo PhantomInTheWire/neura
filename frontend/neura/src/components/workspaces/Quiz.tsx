@@ -114,7 +114,7 @@ export default function Quiz() {
                     <Button
                       key={optionIndex}
                       variant="outline"
-                      className={`w-full justify-start ${
+                      className={`w-full justify-start cursor-pointer ${
                         answers[question.id] === optionIndex
                           ? "!border-primary"
                           : ""

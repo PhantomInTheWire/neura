@@ -10,15 +10,11 @@ import {
   MessagesSquare,
   Book,
   HelpCircle,
-  ChevronLeft,
+  // ChevronLeft,
+  PanelLeftClose,
 } from "lucide-react";
 import Link from "next/link";
-// import {
-//   Tooltip,
-//   TooltipContent,
-//   TooltipProvider,
-//   TooltipTrigger,
-// } from "@/components/ui/tooltip";
+import { usePathname } from "next/navigation";
 
 const LINKS = [
   { name: "Uploads", icon: Upload, url: "uploads" },
@@ -32,6 +28,7 @@ export default function Sidebar({ workspaceId }: { workspaceId: string }) {
   const [isOpen, toggleOpen] = useSidebarStore(
     useShallow((state) => [state.isOpen, state.toggleOpen])
   );
+  const pathname = usePathname();
 
   return (
     <div
@@ -40,69 +37,61 @@ export default function Sidebar({ workspaceId }: { workspaceId: string }) {
         isOpen ? "w-64" : "w-16"
       )}
     >
-      <div className="flex items-center p-4 border-b">
+      {/* Header */}
+      <Link href="/" className="flex items-center p-4 border-b">
         <h1
           className={cn(
-            "font-bold text-xl transition-all duration-300",
-            isOpen ? "opacity-100" : "opacity-0 w-0"
+            "font-bold text-2xl transition-all duration-300",
+            isOpen ? "" : "mx-auto"
+            // isOpen ? "opacity-100" : "opacity-0 w-0"
           )}
         >
-          Neura
+          {isOpen ? "Neura" : "N"}
         </h1>
+      </Link>
+
+      {/* Navigation Links */}
+      <nav className="flex-1 flex flex-col gap-2 p-4">
+        {LINKS.map((link) => {
+          const isActive = pathname.includes(link.url);
+          return (
+            <Link href={`./${link.url}`} key={link.name}>
+              <Button
+                variant={isActive ? "secondary" : "ghost"}
+                className={cn(
+                  "w-full justify-start cursor-pointer",
+                  !isOpen && "justify-center",
+                  isActive ? "bg-muted" : "opacity-60"
+                )}
+              >
+                <link.icon
+                  className={cn("h-4 w-4", isActive && "text-primary")}
+                />
+                {isOpen && (
+                  <span className={cn("ml-3", isActive && "font-medium")}>
+                    {link.name}
+                  </span>
+                )}
+              </Button>
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* Toggle Button at Bottom */}
+      <div className="p-4 border-t mt-auto mb-8">
         <Button
           variant="ghost"
-          size="icon"
+          size="sm"
           onClick={toggleOpen}
-          className={cn(
-            "h-8 w-8 cursor-pointer z-10",
-            isOpen ? "ml-auto" : "mx-auto"
-          )}
+          className="w-full justify-center cursor-pointer"
         >
-          <ChevronLeft
+          <PanelLeftClose
             className={cn("h-4 w-4 transition-all", !isOpen && "rotate-180")}
           />
+          {isOpen && <span className="ml-2">Collapse</span>}
         </Button>
       </div>
-
-      <nav className="flex flex-col gap-2 p-4">
-        {LINKS.map((link) => (
-          <Link href={`./${link.url}`} key={link.name}>
-            <Button
-              variant="ghost"
-              className={cn(
-                "w-full justify-start cursor-pointer",
-                !isOpen && "justify-center"
-              )}
-            >
-              <link.icon className="h-4 w-4" />
-              {isOpen && <span className="ml-3">{link.name}</span>}
-            </Button>
-          </Link>
-        ))}
-      </nav>
     </div>
   );
 }
-
-// {/* <TooltipProvider delayDuration={0}>
-//           {LINKS.map((link) => (
-//             <Tooltip key={link.name}>
-//               {/* <TooltipTrigger asChild> */}
-//                 <Button
-//                   variant="ghost"
-//                   className={cn(
-//                     "w-full justify-start cursor-pointer",
-//                     !isOpen && "justify-center"
-//                   )}
-//                   onClick={link.action}
-//                 >
-//                   <link.icon className="h-4 w-4" />
-//                   {isOpen && <span className="ml-3">{link.name}</span>}
-//                 </Button>
-//               {/* </TooltipTrigger> */}
-//               {!isOpen && (
-//                 <TooltipContent side="right">{link.name}</TooltipContent>
-//               )}
-//             </Tooltip>
-//           ))}
-//         </TooltipProvider> */}

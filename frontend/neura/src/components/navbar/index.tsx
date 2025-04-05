@@ -56,7 +56,7 @@ export default function Navbar() {
 
           {/* Profile Avatar */}
           <Avatar className="cursor-pointer">
-            <AvatarImage src="https://github.com/shadcn.png" />
+            <AvatarImage src="https://avatars.githubusercontent.com/u/47332922" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
         </div>
