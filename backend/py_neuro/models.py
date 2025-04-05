@@ -20,7 +20,7 @@ class PyObjectId(ObjectId):
             if not ObjectId.is_valid(v):
                 raise ValueError("Invalid ObjectId")
             return ObjectId(v)
-
+    
         # Schema for validating input (either ObjectId instance or a string)
         from_input_schema = core_schema.union_schema(
             [

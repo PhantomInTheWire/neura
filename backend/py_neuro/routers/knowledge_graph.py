@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from typing import List
-from py_neuro import models # Use absolute import
+import models
 
 router = APIRouter()
 
@@ -39,3 +39,4 @@ async def get_topic_edges(notebook_id: int):
     # Note: notebook_id might need to be ObjectId if linked to Workspaces
     print(f"Fetching edges for notebook_id: {notebook_id}")
     return dummy_edges
+
