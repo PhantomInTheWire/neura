@@ -18,6 +18,7 @@ export function useFileUpload() {
           url: URL.createObjectURL(file),
           type: file.type,
           size: file.size,
+          file: file,
         }));
         addFiles(filesArray);
       }

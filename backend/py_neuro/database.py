@@ -1,6 +1,6 @@
 import logging
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase, AsyncIOMotorGridFSBucket
-from py_neuro.config import settings # Import the settings instance
+from .config import settings # Import the settings instance
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -18,7 +18,11 @@ async def connect_to_mongo():
     """Establishes the MongoDB connection."""
     logger.info("Connecting to MongoDB...")
     try:
-        db_instance.client = AsyncIOMotorClient(settings.MONGODB_URL)
+        # Add a server selection timeout (e.g., 5 seconds)
+        db_instance.client = AsyncIOMotorClient(
+            settings.MONGODB_URL,
+            serverSelectionTimeoutMS=5000
+        )
         db_instance.db = db_instance.client[settings.DATABASE_NAME] # Access the specific database
         db_instance.fs = AsyncIOMotorGridFSBucket(db_instance.db) # Initialize GridFS bucket
         # You can add a check here to verify the connection, e.g., by pinging the server

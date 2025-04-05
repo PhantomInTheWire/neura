@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from typing import List
-from py_neuro import models # Use absolute import
+from .. import models # Relative import
 
 router = APIRouter()
 

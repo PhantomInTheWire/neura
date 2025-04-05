@@ -1,6 +1,6 @@
 "use client";
 
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation"; // Import useRouter
 import { useState } from "react";
 import { useShallow } from "zustand/shallow";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,13 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatFileSize } from "@/lib/utils";
 import { MultiStepLoader as Loader } from "@/components/ui/multistep-loader";
 import { IconSquareRoundedX } from "@tabler/icons-react";
+
+// Define expected response structure (based on backend/py_neuro/models.py StudyGuideResponse)
+interface UploadResponse {
+  _id: string; // The ID of the created study guide document
+  original_filename: string;
+  // Include other fields if needed
+}
 
 const loadingStates = [
   {
@@ -38,77 +45,121 @@ const loadingStates = [
 ];
 
 export default function Uploads({ workspaceId }: { workspaceId: string }) {
-  const BASE_URL = process.env.API_ENDPOINT ?? "http://localhost:8000";
+  const router = useRouter(); // Get router instance
+  const BASE_URL = process.env.NEXT_PUBLIC_API_URL; // Use correct env variable
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null); // Add error state
   const { fileInputRef, handleFileChange, removeFile } = useFileUpload();
   const files = useFileStore(useShallow((state) => state.files));
+  const clearFiles = useFileStore((state) => state.clearFiles); // Get clearFiles action
 
+  // dataURLtoBlob function removed as it seems unused in the current logic
+
+  // Update the handleGenerateOverview function
   const handleGenerateOverview = async () => {
     setLoading(true);
+    setError(null); // Reset error
+
+    if (!BASE_URL) {
+      setError("API URL is not configured.");
+      setLoading(false);
+      return;
+    }
+    if (!workspaceId) {
+      setError("Workspace ID is missing.");
+      setLoading(false);
+      return;
+    }
+    if (files.length === 0) {
+      setError("Please select a file to upload.");
+      setLoading(false);
+      return;
+    }
+
+    // --- Modification: Upload only the first file ---
+    // TODO: Implement multi-file upload handling (e.g., sequential uploads or backend change)
+    const fileToUpload = files[0];
+    if (!fileToUpload || !fileToUpload.file) {
+       setError("Selected file is invalid.");
+       setLoading(false);
+       return;
+    }
+    console.log("Uploading file:", fileToUpload.name);
+    // --- End Modification ---
+
+    let studyGuideId: string | null = null; // To store the ID from response
+
     try {
       const formData = new FormData();
+      // --- Modification: Append only the first file with key "file" ---
+      formData.append("file", fileToUpload.file, fileToUpload.name);
+      // --- End Modification ---
 
-      // Attach all files from the store
-      files.forEach((file) => {
-        // Convert data URL back to File object
-        const fileBlob = dataURLtoBlob(file.url);
-        formData.append(
-          "files",
-          new File([fileBlob], file.name, { type: file.type })
+      // Only proceed if we have the file in formData
+      if (formData.has("file")) {
+        const response = await fetch(
+          `${BASE_URL}/api/workspaces/${workspaceId}/study-guides`,
+          {
+            method: "POST",
+            body: formData,
+            // Note: Don't set Content-Type header manually for FormData,
+            // the browser will set it correctly with the boundary.
+          }
         );
-      });
 
-      const response = await fetch(`${BASE_URL}/api/study-guides/upload`, {
-        method: "POST",
-        body: formData,
-      });
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Upload failed: ${response.status} ${errorText}`);
+        }
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const result: UploadResponse = await response.json();
+        studyGuideId = result._id; // Use _id from response
+        clearFiles(); // Clear files from store on successful upload
+
+        // Add a longer delay before redirecting to allow DB update to settle
+        setTimeout(() => {
+          // Force a full page navigation to ensure fresh data load
+          window.location.href = `/w/${workspaceId}/overview`;
+        }, 2000); // Increased to 2000ms (2 seconds) to ensure backend has time to update the workspace
+
+      } else {
+        // This case should ideally not be reached due to checks above
+        throw new Error("No valid file prepared for upload.");
       }
-
-      const result = await response.json();
-      redirect(`./w/${result.id}`);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Upload failed:", error);
-      // Add error handling here (e.g., toast notification)
+      setError(error.message || "An unknown error occurred during upload.");
+      setLoading(false); // Stop loading on error
     } finally {
-      setLoading(false);
+      // setLoading(false); // Loading is stopped on error or navigation triggers page change
+      // No need to redirect here, router.push handles navigation on success
     }
   };
-
-  const dataURLtoBlob = (dataUrl: string): Blob => {
-    const arr = dataUrl.split(",");
-    const mime = arr[0].match(/:(.*?);/)?.[1];
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new Blob([u8arr], { type: mime });
-  };
+  //   try { // Removing duplicated loadingStates and commented out try block
+  // };
 
   return (
-    // Removed container div with p-6 to avoid double padding from layout
-    <>
+    <div className="p-6 w-full max-w-4xl mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Upload Section */}
         <div className="space-y-6">
           <div className="space-y-2">
-            <h3 className="text-lg font-medium">Upload Files</h3>
+            <h3 className="text-lg font-medium">Upload Document</h3>
+             {/* Clarify that only one file is processed for now */}
             <p className="text-sm text-muted-foreground">
-              Support for images, PDFs, videos, and more
+              Select a document (PDF, DOCX, PPTX, TXT) to generate a study guide. (Currently processes first selected file only)
             </p>
+            {error && <p className="text-sm text-red-500">{error}</p>} {/* Display error */}
           </div>
 
           <Input
             type="file"
-            multiple // Add multiple attribute
+            // multiple // Keep multiple selection UI, but only first is used
             className="hidden"
             ref={fileInputRef}
             onChange={handleFileChange}
-            accept="image/*,.pdf,.doc,.docx,.txt,.mp4,.mp3" // Optional: restrict file types
+            // Update accepted types based on backend support
+            accept=".pdf,.docx,.pptx,.txt"
           />
 
           <div
@@ -119,9 +170,9 @@ export default function Uploads({ workspaceId }: { workspaceId: string }) {
               <FilePlus className="h-6 w-6 text-muted-foreground" />
             </div>
             <div className="text-center">
-              <p className="text-sm font-medium">Click to select files</p>
+              <p className="text-sm font-medium">Click to select a file</p>
               <p className="text-xs text-muted-foreground">
-                You can select multiple files
+                PDF, DOCX, PPTX, TXT supported
               </p>
             </div>
           </div>
@@ -196,6 +247,6 @@ export default function Uploads({ workspaceId }: { workspaceId: string }) {
           </ScrollArea>
         </div>
       </div>
-    </>
+    </div>
   );
 }

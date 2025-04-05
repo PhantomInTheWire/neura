@@ -5,8 +5,8 @@ import logging
 import os
 from typing import List
 
-# Use absolute import
-from py_neuro import models
+# Use relative import
+from . import models
 
 logger = logging.getLogger(__name__)
 

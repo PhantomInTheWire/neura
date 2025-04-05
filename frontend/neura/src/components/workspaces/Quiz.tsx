@@ -34,7 +34,7 @@ export default function Quiz() {
 
   return (
     // Removed container div with p-6 to avoid double padding from layout
-    <>
+    <div className="p-6 w-full max-w-4xl mx-auto">
       <Card className="mb-6">
         <CardHeader>
           <CardTitle>Web-Scale Graph Quiz</CardTitle>
@@ -142,6 +142,6 @@ export default function Quiz() {
           </Button>
         </div>
       )}
-    </>
+    </div>
   );
 }

@@ -1,6 +1,6 @@
 import Navbar from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
-import SectionsSidebar from "@/components/sections-sidebar"; // Import the new sidebar
+// import SectionsSidebar from "@/components/sections-sidebar"; // Import the new sidebar
 // import { Separator } from "@/components/ui/separator";
 
 type Props = {
@@ -10,21 +10,19 @@ type Props = {
   };
 };
 
-export default async function layout({ children, params }: Props) {
-  const { workspaceId } = await params;
+// Accept full params object
+export default function Layout({ children, params }: Props) {
+  // Extract workspaceId inside the function body
+  const { workspaceId } = params;
+
   return (
-    <div className="w-full flex h-screen overflow-hidden"> {/* Ensure full height and hide overflow */}
+    <div className="w-full flex h-screen overflow-hidden">
+      {/* Pass the extracted workspaceId */}
       <Sidebar workspaceId={workspaceId} />
-      {/* Main Content Area */}
-      <main className="flex-1 flex flex-col overflow-y-auto"> {/* Allow vertical scrolling */}
+      <main className="flex-1 flex flex-col overflow-y-auto">
         <Navbar />
-        {/* Constrain width and center the content */}
-        <div className="flex-1 p-6 w-full max-w-4xl mx-auto"> {/* Added max-width and mx-auto */}
-          {children}
-        </div>
+        <div className="flex-1">{children}</div>
       </main>
-      {/* Right Sections Sidebar */}
-      <SectionsSidebar /> {/* Add the new sidebar */}
     </div>
   );
 }
