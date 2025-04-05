@@ -1,7 +1,7 @@
 import random
 from fastapi import APIRouter, HTTPException
 from typing import List
-from python_chatedu_api import models # Use absolute import
+import models # Use absolute import
 
 router = APIRouter()
 

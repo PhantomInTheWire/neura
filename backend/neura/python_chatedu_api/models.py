@@ -1,6 +1,43 @@
-from pydantic import BaseModel
-from typing import List
+# from sqlalchemy import Column, String, DateTime, Text
+# from sqlalchemy.ext.declarative import declarative_base
+from pydantic import BaseModel, Field
+from typing import Optional, List
+from datetime import datetime
+from bson import ObjectId
 
+class PyObjectId(ObjectId):
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        if not ObjectId.is_valid(v):
+            raise ValueError("Invalid ObjectId")
+        return ObjectId(v)
+
+class WorkspaceBase(BaseModel):
+    title: str
+    description: Optional[str] = None
+
+class WorkspaceCreate(WorkspaceBase):
+    pass
+
+class WorkspaceUpdate(WorkspaceBase):
+    pass
+
+class Workspace(WorkspaceBase):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+
+
+
+# Topics
 class TopicNode(BaseModel):
     id: int
     name: str

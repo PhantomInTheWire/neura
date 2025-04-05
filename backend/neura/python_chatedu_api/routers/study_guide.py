@@ -19,7 +19,7 @@ from docx import Document
 # Let's add python-docx-image to requirements later if needed, or skip docx images for now.
 # For initial implementation, we'll focus on PDF and PPTX images.
 
-from python_chatedu_api import models
+import models
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
