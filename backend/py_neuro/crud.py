@@ -115,6 +115,20 @@ async def get_study_guide(db: AsyncIOMotorDatabase, study_guide_id: str) -> mode
         # Depending on desired behavior, could raise HTTPException here or return None
         return None
 
+async def get_study_guides_for_workspace(db: AsyncIOMotorDatabase, workspace_id: str) -> List[models.StudyGuideResponse]:
+    """Fetches all study guide documents associated with a specific workspace_id."""
+    study_guides = []
+    try:
+        oid = ObjectId(workspace_id)
+        cursor = db[STUDY_GUIDE_COLLECTION].find({"workspace_id": oid})
+        async for document in cursor:
+            study_guides.append(models.StudyGuideResponse.model_validate(document))
+        logger.info(f"Retrieved {len(study_guides)} study guides for workspace ID: {workspace_id}")
+    except Exception as e:
+        logger.error(f"Error retrieving study guides for workspace {workspace_id}: {e}")
+        # Return empty list on error, or re-raise/handle differently
+    return study_guides
+
 
 # --- Placeholder CRUD functions for other models (e.g., Workspace) ---
 # Example:

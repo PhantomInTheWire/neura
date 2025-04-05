@@ -5,7 +5,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase # Use Database type hint
 
 # Use absolute imports
 from py_neuro.models import Workspace, WorkspaceCreate, WorkspaceUpdate
-from py_neuro.db import get_database # Use the correct dependency function name
+from py_neuro.database import get_database # Corrected import path
 
 router = APIRouter()
 
@@ -89,3 +89,5 @@ async def delete_workspace(workspace_id: str, db: AsyncIOMotorDatabase = Depends
         raise HTTPException(status_code=404, detail="Workspace not found")
     # No content to return on successful delete
     return None # Or return Response(status_code=204)
+
+

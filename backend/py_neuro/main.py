@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware # Import CORS middleware
 # Use absolute imports relative to py_neuro
 from py_neuro.routers import knowledge_graph, topics, study_guide, workspaces, files # Add files router
 from py_neuro.database import connect_to_mongo, close_mongo_connection
@@ -9,6 +10,19 @@ app = FastAPI(
     version="0.1.0",
 )
 
+# Configure CORS
+origins = [
+    "http://localhost:3000", # The origin for your Next.js frontend during development
+    # Add other origins if needed, e.g., your deployed frontend URL
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"], # Allows all standard methods
+    allow_headers=["*"], # Allows all headers
+)
 
 # Include routers
 # Order might matter depending on path specificity, putting workspaces first as in source

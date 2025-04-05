@@ -127,6 +127,8 @@ class StudyGuideResponse(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
     # Add field to store the GridFS ID of the original uploaded PDF
     original_pdf_gridfs_id: Optional[PyObjectId] = None
+    # Add field to link this study guide to a workspace
+    workspace_id: PyObjectId # This should be required
 
     class Config:
         populate_by_name = True

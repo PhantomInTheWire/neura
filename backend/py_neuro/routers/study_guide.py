@@ -16,6 +16,7 @@ import fitz # PyMuPDF
 from pptx import Presentation
 from pptx.enum.shapes import MSO_SHAPE_TYPE
 from docx import Document
+from bson import ObjectId # Import ObjectId
 
 # Use absolute import
 from py_neuro import models
@@ -312,16 +313,16 @@ You will receive the full text content of the document and a list of image filen
 
 
 # --- API Endpoint ---
-# Update the response model for the endpoint decorator and function name
-@router.post("/upload", response_model=models.StudyGuideResponse)
-# Add database and GridFS dependency injection
-async def create_hierarchical_study_guide(
+# Update the route to the desired structure
+@router.post("/workspaces/{workspace_id}/upload", response_model=models.StudyGuideResponse)
+async def upload_and_create_study_guide( # Renamed function for clarity
+    workspace_id: str, # Add workspace_id path parameter
     file: UploadFile = File(...),
     db: AsyncIOMotorDatabase = Depends(get_database),
-    fs: AsyncIOMotorGridFSBucket = Depends(get_gridfs_bucket) # Inject GridFS bucket
+    fs: AsyncIOMotorGridFSBucket = Depends(get_gridfs_bucket)
 ):
     """
-    Uploads a document, extracts text and images (PDF, PPTX), pre-filters images,
+    Uploads a document for a specific workspace, extracts text/images,
     and generates a hierarchical study guide using Gemini multimodal capabilities.
     """
     if not file.filename:
@@ -382,7 +383,8 @@ async def create_hierarchical_study_guide(
         response_data = models.StudyGuideResponse(
             original_filename=file.filename,
             extracted_images=all_extracted_images_info, # Return info for all originally extracted images
-            study_guide=study_guide_main_sections # Hierarchical study guide
+            study_guide=study_guide_main_sections, # Hierarchical study guide
+            workspace_id=ObjectId(workspace_id) # Add workspace_id to the model data
         )
 
         # Construct paths for the filtered images that were actually processed and potentially sent to Gemini
@@ -423,3 +425,18 @@ async def read_study_guide(study_guide_id: str, db: AsyncIOMotorDatabase = Depen
     if study_guide is None:
         raise HTTPException(status_code=404, detail="Study guide not found")
     return study_guide
+
+# Endpoint to retrieve all study guides for a specific workspace
+@router.get("/workspaces/{workspace_id}/study-guides/", response_model=List[models.StudyGuideResponse]) # Corrected path
+async def list_study_guides_for_workspace(workspace_id: str, db: AsyncIOMotorDatabase = Depends(get_database)):
+    """
+    Retrieves all study guide documents associated with a specific workspace_id.
+    """
+    # Basic validation for workspace_id format
+    if not ObjectId.is_valid(workspace_id):
+         raise HTTPException(status_code=400, detail="Invalid workspace ID format")
+
+    study_guides = await crud.get_study_guides_for_workspace(db=db, workspace_id=workspace_id)
+    # The CRUD function returns an empty list if none are found or on error,
+    # so we don't strictly need to check for None here unless we want to differentiate.
+    return study_guides
