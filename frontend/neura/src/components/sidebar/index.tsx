@@ -25,7 +25,7 @@ const LINKS = [
   { name: "FAQ", icon: HelpCircle, url: "faq" },
 ];
 
-export default function Sidebar({ workspaceId }: { workspaceId: string }) {
+export default function Sidebar() {
   const [isOpen, toggleOpen] = useSidebarStore(
     useShallow((state) => [state.isOpen, state.toggleOpen])
   );

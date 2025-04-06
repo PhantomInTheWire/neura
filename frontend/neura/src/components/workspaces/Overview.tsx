@@ -220,6 +220,7 @@ export default function Overview({ workspaceId }: OverviewProps) {
                         <VideoPlayer
                           title={section.section_title}
                           videoId={section.section_id}
+                          description={section.section_overview_description}
                         />
                       </div>
                     </CardHeader>
