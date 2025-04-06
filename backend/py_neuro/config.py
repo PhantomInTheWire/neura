@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     MONGODB_URL: str = "mongodb://localhost:27017" # Renamed for clarity
     DATABASE_NAME: str = "Cluster0" # Renamed for clarity
     GEMINI_API_KEY: str = "" # Added Gemini key
+    kokoro_model_path: str = "" # Added Kokoro model path
+    kokoro_voices_path: str = "" # Added Kokoro voices path
 
     class Config:
         # Construct the path to the .env file relative to this config file
